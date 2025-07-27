@@ -1,116 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <title>تقرير يومي - وضع مدني</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      background-color: #f9f9f9;
-      direction: rtl;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    input, textarea, select {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    button {
-      margin-top: 15px;
-      padding: 10px 15px;
-      font-size: 16px;
-      cursor: pointer;
-      border: none;
-      border-radius: 4px;
-    }
-    #saveBtn { background-color: #2196F3; color: white; }
-    #sendBtn { background-color: #4CAF50; color: white; }
-    #whatsappBtn { background-color: #25D366; color: white; }
-    #pdfBtn { background-color: #9C27B0; color: white; }
-  </style>
-</head>
-<body>
-  <h2>تقرير يومي: صورة الوضع المدني</h2>
-  <form id="reportForm">
-    <label>🗓️ التاريخ: <input type="date" name="date"></label>
-    <label>🕒 الساعة: <input type="time" name="time"></label>
-    <label>اسم البلدة / الحي: <input name="town"></label>
-    <label>عدد السكان الحالي: <input name="population"></label>
-    <label>اسم مسؤول البلدة + رقم الهاتف: <input name="leader"></label>
-    <label>اسم قائد القوة العسكرية: <input name="commander"></label>
-    <label>عدد المخلفين: <input name="evacuated"></label>
-    <label>المخطوفين: <input name="kidnapped"></label>
-    <label>اللاجئين / المستضافين: <input name="refugees"></label>
-    <label>المصابين / المتضررين: <input name="injured"></label>
-    <label>مركز الاتصال: <input name="contact_center"></label>
-    <label>مركز طبي / عيادات: <input name="medical_center"></label>
-    <label>معدات لفتح الطرق: <input name="equipment"></label>
-    <label>حالة المياه: <input name="water"></label>
-    <label>حالة الاتصال: <input name="network"></label>
-    <label>حالة الكهرباء: <input name="electricity"></label>
-    <label>حالة الوقود: <input name="fuel"></label>
-    <label>حالة الطعام: <input name="food"></label>
-    <label>حالة الغاز: <input name="gas"></label>
-    <label>حالة الأدوية / الصيدليات: <input name="pharmacy"></label>
-    <label>ملاحظات / احتياجات: <textarea name="notes"></textarea></label>
-    <label>اسم معد التقرير: <input name="reporter"></label>
-    <button id="saveBtn" type="button" onclick="saveLocal()">شفظ محليا</button>
-    <button id="sendBtn" type="button" onclick="sendLater()">إرسال عندما يتوفر إنترنت</button>
-    <button id="whatsappBtn" type="button" onclick="sendToWhatsapp()">إرسال عبر واتساب</button>
-    <button id="pdfBtn" type="button" onclick="generatePDF()">حفظ PDF</button>
-  </form>
-
-  <script>
-    function getFormData() {
-      const form = document.forms['reportForm'];
-      const data = {};
-      for (let element of form.elements) {
-        if (element.name) data[element.name] = element.value;
-      }
-      return data;
-    }
-
-    function saveLocal() {
-      const data = getFormData();
-      localStorage.setItem('dailyReport', JSON.stringify(data));
-      alert('تم الحفظ محليا');
-    }
-
-    function sendLater() {
-      const data = localStorage.getItem('dailyReport');
-      if (!data) return alert('لا يوجد تقرير مخزّن');
-      fetch('https://example.com/api', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: data
-      }).then(() => {
-        alert('تم الإرسال');
-        localStorage.removeItem('dailyReport');
-      }).catch(() => alert('فشل في الإرسال'));
-    }
-
-    function sendToWhatsapp() {
-      const data = getFormData();
-      const text = Object.entries(data).map(([k, v]) => `*${k}*: ${v}`).join('%0A');
-      window.open(`https://wa.me/?text=${text}`, '_blank');
-    }
-
-    function generatePDF() {
-      const data = getFormData();
-      let text = Object.entries(data).map(([k, v]) => `${k}: ${v}`).join('\n');
-      const blob = new Blob([text], { type: 'application/pdf' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'report.pdf';
-      link.click();
-    }
-  </script>
-</body>
-</html>
